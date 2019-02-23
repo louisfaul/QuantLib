@@ -77,7 +77,7 @@ namespace QuantLib {
     }
 
     Real ExtendedAdditiveEQPBinomialTree::upStep(Time stepTime) const {
-      Real driftStep_ = this->driftStepByCache(0.0);
+      Real driftStep_ = this->driftStepByCache(stepTime);
       return (-0.5 * driftStep_ + 0.5 *
         std::sqrt(4.0*this->treeProcess_->variance(stepTime, x0_, dt_) -
           3.0*driftStep_*driftStep_));
@@ -105,8 +105,9 @@ namespace QuantLib {
     }
 
     Real ExtendedTrigeorgis::dxStep(Time stepTime) const {
+        Real driftStep_ = this->driftStepByCache(stepTime);
         return std::sqrt(this->treeProcess_->variance(stepTime, x0_, dt_) +
-			     std::pow(this->driftStepByCache(stepTime), 2));
+			     driftStep_*driftStep_);
     }
 
 
@@ -194,8 +195,8 @@ namespace QuantLib {
         Real driftStep_ = this->driftStepByCache(stepTime);
 
         Real ermqdt = std::exp(driftStep_ + 0.5*variance / oddSteps_);
-		Real d2 = (std::log(x0_ / strike_) + driftStep_*oddSteps_) /
-			std::sqrt(variance);
+		    Real d2 = (std::log(x0_ / strike_) + driftStep_*oddSteps_) /
+			     std::sqrt(variance);
 
         Real pu = PeizerPrattMethod2Inversion(d2, oddSteps_);
         Real pdash = PeizerPrattMethod2Inversion(d2+std::sqrt(variance),

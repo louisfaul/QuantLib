@@ -6,30 +6,32 @@
 
 namespace QuantLib {
 
-    template <class T1, class T2>
+    template <typename Key, typename Value>
     class Cache {
       public:
         Cache() {}
-        explicit Cache(const QuantLib::ext::function<T2(T1)> f): f{f} {}
-        T2 operator()(T1 key) const {
-            typename std::tr1::unordered_map<T1, T2>::iterator it = memory_map.find(key);
+        explicit Cache(const QuantLib::ext::function<Value(Key)> f): f{f} {}
+        ~Cache(){ clear();}
+
+        Value operator()(Key key) const {
+            typename std::tr1::unordered_map<Key, Value>::iterator it = memory_map.find(key);
             if (it != memory_map.end())
                 return it->second;
             else
-                return calculateData(key);
+                return put(key);
         }
 
-        void setf(const QuantLib::ext::function<T2(T1)> f_) { f = f_; }
+        void setf(const QuantLib::ext::function<Value(Key)> f_) { f = f_; }
 
-        void clear() { memory_map.clear; }
-        void erase(T1 key) { memory_map.erase(key); }
+        void clear() { memory_map.clear(); }
+        void erase(Key key) { memory_map.erase(key); }
 
       private:
-        QuantLib::ext::function<T2(T1)> f;
-        mutable std::tr1::unordered_map<T1, T2> memory_map;
+        QuantLib::ext::function<Value(Key)> f;
+        mutable std::tr1::unordered_map<Key, Value> memory_map;
 
-        T2 calculateData(T1 key) const {
-            T2 value = f(key);
+        Value put(Key key) const {
+            Value value = f(key);
             memory_map[key] = value;
             return value;
         }

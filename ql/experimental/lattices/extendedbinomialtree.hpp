@@ -114,7 +114,6 @@ namespace QuantLib {
                         Size steps)
         : ExtendedBinomialTree<T>(process, end, steps) {}
         virtual ~ExtendedEqualJumpsBinomialTree() {}
-
         Real underlying(Size i, Size index) const {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);
@@ -138,6 +137,7 @@ namespace QuantLib {
         //time dependent term dx_
         virtual Real dxStep(Time stepTime) const = 0;
         Cache<Time, Real> probUpByCache;
+        // probUpByCache.setf(ext::bind(&ExtendedEqualJumpsBinomialTree::probUp, this, _1));
         Cache<Time, Real> dxStepByCache;
 
         Real dx_, pu_, pd_;
