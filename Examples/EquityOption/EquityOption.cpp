@@ -219,7 +219,7 @@ int main(int, char* []) {
         //           << std::endl;
 
         // Finite differences
-        Size timeSteps = 5000;
+        Size timeSteps = 2000;
         // method = "Finite differences";
         // europeanOption.setPricingEngine(ext::shared_ptr<PricingEngine>(
         //          new FDEuropeanEngine<CrankNicolson>(bsmProcess,
