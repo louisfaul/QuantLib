@@ -27,10 +27,10 @@
 #ifndef quantlib_extended_binomial_tree_hpp
 #define quantlib_extended_binomial_tree_hpp
 
-#include <ql/methods/lattices/tree.hpp>
-#include <ql/instruments/dividendschedule.hpp>
-#include <ql/stochasticprocess.hpp>
 #include "Cache.hpp"
+#include <ql/instruments/dividendschedule.hpp>
+#include <ql/methods/lattices/tree.hpp>
+#include <ql/stochasticprocess.hpp>
 
 namespace QuantLib {
 
@@ -90,7 +90,6 @@ namespace QuantLib {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);
             // exploiting the forward value tree centering
-            // return this->x0_*std::exp(i*this->driftStep(stepTime) + j*this->upStep(stepTime));
             return this->x0_*std::exp(i*this->driftStepByCache(stepTime) + j*this->upStepByCache(stepTime));
 
         }
@@ -120,7 +119,6 @@ namespace QuantLib {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);
             // exploiting equal jump and the x0_ tree centering
-            // return this->x0_*std::exp(j*this->dxStep(stepTime));
             return this->x0_*std::exp(j*this->dxStepByCache(stepTime));
 
         }
