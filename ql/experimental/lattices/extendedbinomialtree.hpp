@@ -30,11 +30,14 @@
 #include <ql/methods/lattices/tree.hpp>
 #include <ql/instruments/dividendschedule.hpp>
 #include <ql/stochasticprocess.hpp>
+#include "Cache.hpp"
 
 namespace QuantLib {
 
     //! Binomial tree base class
     /*! \ingroup lattices */
+    using namespace ext::placeholders;
+
     template <class T>
     class ExtendedBinomialTree : public Tree<T> {
       public:
@@ -47,6 +50,8 @@ namespace QuantLib {
             x0_ = process->x0();
             dt_ = end/steps;
             driftPerStep_ = process->drift(0.0, x0_) * dt_;
+            driftStepByCache.setf(ext::bind(&ExtendedBinomialTree::driftStep, this, _1));
+
         }
         Size size(Size i) const {
             return i+1;
@@ -59,7 +64,7 @@ namespace QuantLib {
         Real driftStep(Time driftTime) const {
             return this->treeProcess_->drift(driftTime, x0_) * dt_;
         }
-
+        Cache<Time, Real> driftStepByCache;
         Real x0_, driftPerStep_;
         Time dt_;
 
@@ -85,13 +90,16 @@ namespace QuantLib {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);
             // exploiting the forward value tree centering
-            return this->x0_*std::exp(i*this->driftStep(stepTime) + j*this->upStep(stepTime));
+            // return this->x0_*std::exp(i*this->driftStep(stepTime) + j*this->upStep(stepTime));
+            return this->x0_*std::exp(i*this->driftStepByCache(stepTime) + j*this->upStepByCache(stepTime));
+
         }
 
         Real probability(Size, Size, Size) const { return 0.5; }
       protected:
         //the tree dependent up move term at time stepTime
         virtual Real upStep(Time stepTime) const = 0;
+        Cache<Time, Real> upStepByCache;
         Real up_;
     };
 
@@ -112,7 +120,9 @@ namespace QuantLib {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);
             // exploiting equal jump and the x0_ tree centering
-            return this->x0_*std::exp(j*this->dxStep(stepTime));
+            // return this->x0_*std::exp(j*this->dxStep(stepTime));
+            return this->x0_*std::exp(j*this->dxStepByCache(stepTime));
+
         }
 
         Real probability(Size i, Size, Size branch) const {
@@ -126,6 +136,7 @@ namespace QuantLib {
         virtual Real probUp(Time stepTime) const = 0;
         //time dependent term dx_
         virtual Real dxStep(Time stepTime) const = 0;
+        Cache<Time, Real> dxStepByCache;
 
         Real dx_, pu_, pd_;
     };
