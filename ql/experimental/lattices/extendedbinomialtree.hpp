@@ -112,7 +112,9 @@ namespace QuantLib {
                         const ext::shared_ptr<StochasticProcess1D>& process,
                         Time end,
                         Size steps)
-        : ExtendedBinomialTree<T>(process, end, steps) {}
+        : ExtendedBinomialTree<T>(process, end, steps) {
+          probUpByCache.setf(ext::bind(&ExtendedEqualJumpsBinomialTree::probUp, this, _1));
+        }
         virtual ~ExtendedEqualJumpsBinomialTree() {}
         Real underlying(Size i, Size index) const {
             Time stepTime = i*this->dt_;
@@ -137,7 +139,6 @@ namespace QuantLib {
         //time dependent term dx_
         virtual Real dxStep(Time stepTime) const = 0;
         Cache<Time, Real> probUpByCache;
-        // probUpByCache.setf(ext::bind(&ExtendedEqualJumpsBinomialTree::probUp, this, _1));
         Cache<Time, Real> dxStepByCache;
 
         Real dx_, pu_, pd_;

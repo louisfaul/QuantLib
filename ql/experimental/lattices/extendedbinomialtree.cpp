@@ -52,7 +52,6 @@ namespace QuantLib {
         dx_ = process->stdDeviation(0.0, x0_, dt_);
         pu_ = 0.5 + 0.5*this->driftStepByCache(0.0) / dx_;
         pd_ = 1.0 - pu_;
-        probUpByCache.setf(ext::bind(&ExtendedCoxRossRubinstein::probUp, this, _1));
         dxStepByCache.setf(ext::bind(&ExtendedCoxRossRubinstein::dxStep, this, _1));
         QL_REQUIRE(pu_<=1.0, "negative probability");
         QL_REQUIRE(pu_>=0.0, "negative probability");
@@ -90,11 +89,9 @@ namespace QuantLib {
                         const ext::shared_ptr<StochasticProcess1D>& process,
                         Time end, Size steps, Real)
     : ExtendedEqualJumpsBinomialTree<ExtendedTrigeorgis>(process, end, steps) {
-
         Real driftStep_ = this->driftStepByCache(0.0);
         dx_ = std::sqrt(process->variance(0.0, x0_, dt_) +
             driftStep_*driftStep_);
-        probUpByCache.setf(ext::bind(&ExtendedTrigeorgis::probUp, this, _1));
         dxStepByCache.setf(ext::bind(&ExtendedTrigeorgis::dxStep, this, _1));
         pu_ = 0.5 + 0.5*driftStep_ / this->dxStepByCache(0.0);
 
