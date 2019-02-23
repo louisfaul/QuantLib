@@ -11,8 +11,9 @@ namespace QuantLib {
         Cache() {}
         explicit Cache(const QuantLib::ext::function<T2(T1)> f): f{f} {}
         T2 operator()(T1 key) const {
-            if (memory_map.count(key) > 0)
-                return memory_map[key];
+            typename std::map<T1, T2>::iterator it = memory_map.find(key);
+            if (it != memory_map.end())
+                return it->second;
             else
                 return calculateData(key);
         }
@@ -27,13 +28,9 @@ namespace QuantLib {
         mutable std::map<T1, T2> memory_map;
 
         T2 calculateData(T1 key) const {
-            put(key, f(key));
-            return memory_map[key];
-        }
-
-        template <class T3>
-        void put(T1 key, T3 value) const {
-            memory_map[key] = static_cast<T2>(value);
+            T2 value = f(key);
+            memory_map[key] = value;
+            return value;
         }
     };
 

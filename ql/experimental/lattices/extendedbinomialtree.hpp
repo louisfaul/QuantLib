@@ -169,7 +169,6 @@ namespace QuantLib {
                                   Real strike);
       protected:
           Real dxStep(Time stepTime) const;
-          // Real probUp(Time stepTime) const;
     };
 
 
@@ -201,7 +200,6 @@ namespace QuantLib {
                            Real strike);
     protected:
         Real dxStep(Time stepTime) const;
-        // Real probUp(Time stepTime) const;
     };
 
 
