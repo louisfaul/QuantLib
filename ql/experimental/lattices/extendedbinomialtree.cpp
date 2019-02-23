@@ -52,6 +52,7 @@ namespace QuantLib {
         dx_ = process->stdDeviation(0.0, x0_, dt_);
         pu_ = 0.5 + 0.5*this->driftStepByCache(0.0) / dx_;
         pd_ = 1.0 - pu_;
+        probUpByCache.setf(ext::bind(&ExtendedCoxRossRubinstein::probUp, this, _1));
         dxStepByCache.setf(ext::bind(&ExtendedCoxRossRubinstein::dxStep, this, _1));
         QL_REQUIRE(pu_<=1.0, "negative probability");
         QL_REQUIRE(pu_>=0.0, "negative probability");
@@ -59,11 +60,6 @@ namespace QuantLib {
 
     Real ExtendedCoxRossRubinstein::dxStep(Time stepTime) const {
         return this->treeProcess_->stdDeviation(stepTime, x0_, dt_);
-    }
-
-    Real ExtendedCoxRossRubinstein::probUp(Time stepTime) const {
-        return 0.5 + 0.5*this->driftStepByCache(stepTime) / this->dxStepByCache(stepTime);
-
     }
 
 
@@ -96,6 +92,7 @@ namespace QuantLib {
 
         dx_ = std::sqrt(process->variance(0.0, x0_, dt_) +
             this->driftStepByCache(0.0)*this->driftStepByCache(0.0));
+        probUpByCache.setf(ext::bind(&ExtendedTrigeorgis::probUp, this, _1));
         dxStepByCache.setf(ext::bind(&ExtendedTrigeorgis::dxStep, this, _1));
         pu_ = 0.5 + 0.5*this->driftStepByCache(0.0) / this->dxStepByCache(0.0);
 
@@ -108,10 +105,6 @@ namespace QuantLib {
     Real ExtendedTrigeorgis::dxStep(Time stepTime) const {
         return std::sqrt(this->treeProcess_->variance(stepTime, x0_, dt_) +
 			this->driftStepByCache(stepTime)*this->driftStepByCache(stepTime));
-    }
-
-    Real ExtendedTrigeorgis::probUp(Time stepTime) const {
-        return 0.5 + 0.5*this->driftStepByCache(stepTime) / this->dxStepByCache(stepTime);
     }
 
 

@@ -125,15 +125,19 @@ namespace QuantLib {
 
         Real probability(Size i, Size, Size branch) const {
             Time stepTime = i*this->dt_;
-            Real upProb = this->probUp(stepTime);
+            Real upProb = this->probUpByCache(stepTime);
             Real downProb = 1 - upProb;
             return (branch == 1 ? upProb : downProb);
         }
       protected:
         //probability of a up move
-        virtual Real probUp(Time stepTime) const = 0;
+        // virtual Real probUp(Time stepTime) const = 0;
+        Real probUp(Time stepTime) const {
+          return 0.5 + 0.5*this->driftStepByCache(stepTime) / this->dxStepByCache(stepTime);
+        }
         //time dependent term dx_
         virtual Real dxStep(Time stepTime) const = 0;
+        Cache<Time, Real> probUpByCache;
         Cache<Time, Real> dxStepByCache;
 
         Real dx_, pu_, pd_;
@@ -165,7 +169,7 @@ namespace QuantLib {
                                   Real strike);
       protected:
           Real dxStep(Time stepTime) const;
-          Real probUp(Time stepTime) const;
+          // Real probUp(Time stepTime) const;
     };
 
 
@@ -197,7 +201,7 @@ namespace QuantLib {
                            Real strike);
     protected:
         Real dxStep(Time stepTime) const;
-        Real probUp(Time stepTime) const;
+        // Real probUp(Time stepTime) const;
     };
 
 
