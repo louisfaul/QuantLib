@@ -10,7 +10,7 @@ namespace QuantLib {
     class Cache {
       public:
         Cache() {}
-        explicit Cache(const QuantLib::ext::function<Value(Key)> f): f{f} {}
+        explicit Cache(const QuantLib::ext::function<Value(Key)> f_) { f = f_;}
         ~Cache(){ clear();}
 
         Value operator()(Key key) const {
