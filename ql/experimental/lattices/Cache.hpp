@@ -9,7 +9,7 @@ namespace QuantLib {
     class Cache {
       public:
         Cache() {}
-        explicit Cache(const QuantLib::ext::function<T2(T1)> f_) { f = f_; }
+        explicit Cache(const QuantLib::ext::function<T2(T1)> f): f{f} {}
         T2 operator()(T1 key) const {
             if (memory_map.count(key) > 0)
                 return memory_map[key];

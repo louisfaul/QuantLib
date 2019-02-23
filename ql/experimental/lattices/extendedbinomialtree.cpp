@@ -38,7 +38,7 @@ namespace QuantLib {
     }
 
     Real ExtendedJarrowRudd::upStep(Time stepTime) const {
-        return treeProcess_->stdDeviation(stepTime, x0_, dt_);
+        return this->treeProcess_->stdDeviation(stepTime, x0_, dt_);
     }
 
 
@@ -62,8 +62,7 @@ namespace QuantLib {
     }
 
     Real ExtendedCoxRossRubinstein::probUp(Time stepTime) const {
-        // return 0.5 + 0.5*this->driftStep(stepTime)/dxStep(stepTime);
-        return 0.5 + 0.5*this->driftStepByCache(stepTime) / dxStepByCache(stepTime);
+        return 0.5 + 0.5*this->driftStepByCache(stepTime) / this->dxStepByCache(stepTime);
 
     }
 
@@ -112,7 +111,7 @@ namespace QuantLib {
     }
 
     Real ExtendedTrigeorgis::probUp(Time stepTime) const {
-        return 0.5 + 0.5*this->driftStepByCache(stepTime) / dxStepByCache(stepTime);
+        return 0.5 + 0.5*this->driftStepByCache(stepTime) / this->dxStepByCache(stepTime);
     }
 
 
