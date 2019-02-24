@@ -31,6 +31,7 @@
 #include <ql/instruments/dividendschedule.hpp>
 #include <ql/methods/lattices/tree.hpp>
 #include <ql/stochasticprocess.hpp>
+#include <vector>
 
 namespace QuantLib {
 
@@ -51,6 +52,12 @@ namespace QuantLib {
             dt_ = end/steps;
             driftPerStep_ = process->drift(0.0, x0_) * dt_;
             driftStepByCache.setf(ext::bind(&ExtendedBinomialTree::driftStep, this, _1));
+            for (int i = 0; i < steps; i ++) {
+                // driftPerStepCache[i] = i;
+                Time stepTime = i*this->dt_;
+                driftPerStepCache.push_back(this->driftStep(stepTime));
+                // driftPerStepCache[i] = this->driftStep(stepTime);
+            }
 
         }
         Size size(Size i) const {
@@ -65,6 +72,7 @@ namespace QuantLib {
             return this->treeProcess_->drift(driftTime, x0_) * dt_;
         }
         Cache<Time, Real> driftStepByCache;
+        std::vector<Real> driftPerStepCache;
         Real x0_, driftPerStep_;
         Time dt_;
 
@@ -90,7 +98,9 @@ namespace QuantLib {
             Time stepTime = i*this->dt_;
             BigInteger j = 2*BigInteger(index) - BigInteger(i);
             // exploiting the forward value tree centering
-            return this->x0_*std::exp(i*this->driftStepByCache(stepTime) + j*this->upStepByCache(stepTime));
+            // return this->x0_*std::exp(i*this->driftPerStepCache[i] + j*this->upStepByCache(stepTime));
+            return this->x0_*std::exp(i*this->driftStep(stepTime) + j*this->upStepByCache(stepTime));
+            // return this->x0_*std::exp(i*this->driftStepByCache(stepTime) + j*this->upStepByCache(stepTime));
 
         }
 
