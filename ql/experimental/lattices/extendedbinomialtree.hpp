@@ -27,12 +27,11 @@
 #ifndef quantlib_extended_binomial_tree_hpp
 #define quantlib_extended_binomial_tree_hpp
 
-#include "cache.hpp"
 #include <ql/instruments/dividendschedule.hpp>
 #include <ql/methods/lattices/tree.hpp>
 #include <ql/stochasticprocess.hpp>
 #include <vector>
-#include <iostream>
+#include <ql/functional.hpp>
 
 namespace QuantLib {
 
@@ -52,10 +51,9 @@ namespace QuantLib {
             x0_ = process->x0();
             dt_ = end/steps;
             driftPerStep_ = process->drift(0.0, x0_) * dt_;
-            driftStepByCache.setf(ext::bind(&ExtendedBinomialTree::driftStep, this, _1));
             for (Size i = 0; i <= steps; i ++) {
                 Time stepTime = i*this->dt_;
-                driftStepCache.push_back(this->driftStepByCache(stepTime));
+                driftStepCache.push_back(this->driftStep(stepTime));
             }
 
         }
@@ -70,7 +68,6 @@ namespace QuantLib {
         Real driftStep(Time driftTime) const {
             return this->treeProcess_->drift(driftTime, x0_) * dt_;
         }
-        Cache<Time, Real> driftStepByCache;
         std::vector<Real> driftStepCache;
         Real x0_, driftPerStep_;
         Time dt_;
@@ -101,7 +98,7 @@ namespace QuantLib {
         Real probability(Size, Size, Size) const { return 0.5; }
       protected:
         //the tree dependent up move term at time stepTime
-        virtual Real upStep(Time stepTime) const = 0;
+        virtual Real upStep(Size i) const = 0;
         std::vector<Real> upStepCache;
         Real up_;
     };
@@ -133,9 +130,9 @@ namespace QuantLib {
         }
       protected:
         //probability of a up move
-        virtual Real probUp(Time stepTime) const = 0;
+        virtual Real probUp(Size i) const = 0;
         //time dependent term dx_
-        virtual Real dxStep(Time stepTime) const = 0;
+        virtual Real dxStep(Size i) const = 0;
         std::vector<Real> probUpCache;
         std::vector<Real> dxStepCache;
         Real dx_, pu_, pd_;
@@ -152,7 +149,7 @@ namespace QuantLib {
                            Size steps,
                            Real strike);
       protected:
-        Real upStep(Time stepTime) const;
+        Real upStep(Size i) const;
     };
 
 
@@ -166,8 +163,8 @@ namespace QuantLib {
                                   Size steps,
                                   Real strike);
       protected:
-          Real probUp(Time stepTime) const;
-          Real dxStep(Time stepTime) const;
+          Real probUp(Size i) const;
+          Real dxStep(Size i) const;
     };
 
 
@@ -184,7 +181,7 @@ namespace QuantLib {
                         Real strike);
 
       protected:
-          Real upStep(Time stepTime) const;
+          Real upStep(Size i) const;
     };
 
 
@@ -198,8 +195,8 @@ namespace QuantLib {
                            Size steps,
                            Real strike);
     protected:
-        Real probUp(Time stepTime) const;
-        Real dxStep(Time stepTime) const;
+        Real probUp(Size i) const;
+        Real dxStep(Size i) const;
     };
 
 
