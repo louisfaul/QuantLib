@@ -111,10 +111,6 @@ namespace QuantLib {
         }
         dx_ = std::sqrt(process->variance(0.0, x0_, dt_) +
             driftStep_*driftStep_);
-        for (Size i = 0; i <= steps; i ++) {
-            Time stepTime = i*this->dt_;
-            dxStepCache.push_back(this->dxStep(stepTime));
-        }
         pu_ = 0.5 + 0.5*driftStep_ / this->dxStepCache[0];
         pd_ = 1.0 - pu_;
 
