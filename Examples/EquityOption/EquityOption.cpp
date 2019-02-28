@@ -42,6 +42,7 @@
 #include <iostream>
 
 #include <ql/experimental/lattices/extendedbinomialtree.hpp>
+#include <ql/termstructures/volatility/equityfx/blackvariancecurve.hpp>
 
 using namespace QuantLib;
 
@@ -132,15 +133,13 @@ int main(int, char*[]) {
     // Analytic formulas:
 
     // Black-Scholes for European
-    // method = "Black-Scholes";
-    // europeanOption.setPricingEngine(ext::shared_ptr<PricingEngine>(
-    //                              new AnalyticEuropeanEngine(bsmProcess)));
-    // std::cout << std::setw(widths[0]) << std::left << method
-    //           << std::fixed
-    //           << std::setw(widths[1]) << std::left << europeanOption.NPV()
-    //           << std::setw(widths[2]) << std::left << "N/A"
-    //           << std::setw(widths[3]) << std::left << "N/A"
-    //           << std::endl;
+    method = "Black-Scholes";
+    europeanOption.setPricingEngine(
+        ext::shared_ptr<PricingEngine>(new AnalyticEuropeanEngine(bsmProcess)));
+    std::cout << std::setw(widths[0]) << std::left << method << std::fixed
+              << std::setw(widths[1]) << std::left << europeanOption.NPV()
+              << std::setw(widths[2]) << std::left << "N/A"
+              << std::setw(widths[3]) << std::left << "N/A" << std::endl;
 
     // semi-analytic Heston for European
     // method = "Heston semi-analytic";
@@ -210,7 +209,11 @@ int main(int, char*[]) {
     //           << std::endl;
 
     // Finite differences
-    Size timeSteps = 10000;
+    Size timeSteps = 5000;
+    timer.restart();
+    double seconds = timer.elapsed();
+    std::cout << " \nStart in ";
+    std::cout << seconds << " s\n" << std::endl;
     // method = "Finite differences";
     // europeanOption.setPricingEngine(ext::shared_ptr<PricingEngine>(
     //          new FDEuropeanEngine<CrankNicolson>(bsmProcess,
@@ -242,9 +245,10 @@ int main(int, char*[]) {
               << std::setw(widths[3]) << std::left << americanOption.NPV()
               << std::endl;
 
-    double seconds = timer.elapsed();
+    seconds = timer.elapsed();
     std::cout << " \nRun completed in ";
     std::cout << seconds << " s\n" << std::endl;
+    timer.restart();
 
     method = "Extended Binomial Cox-Ross-Rubinstein";
     europeanOption.setPricingEngine(ext::shared_ptr<PricingEngine>(
@@ -265,6 +269,7 @@ int main(int, char*[]) {
     seconds = timer.elapsed();
     std::cout << " \nRun completed in ";
     std::cout << seconds << " s\n" << std::endl;
+    timer.restart();
 
     // Binomial method: Additive equiprobabilities
     method = "Extended Additive equiprobabilities";
@@ -286,6 +291,7 @@ int main(int, char*[]) {
     seconds = timer.elapsed();
     std::cout << " \nRun completed in ";
     std::cout << seconds << " s\n" << std::endl;
+    timer.restart();
 
     // Binomial method: Binomial Trigeorgis
     method = "Extended Binomial Trigeorgis";
@@ -304,6 +310,7 @@ int main(int, char*[]) {
     seconds = timer.elapsed();
     std::cout << " \nRun completed in ";
     std::cout << seconds << " s\n" << std::endl;
+    timer.restart();
 
     // Binomial method: Binomial Tian
     method = "Extended Binomial Tian";
@@ -322,6 +329,7 @@ int main(int, char*[]) {
     seconds = timer.elapsed();
     std::cout << " \nRun completed in ";
     std::cout << seconds << " s\n" << std::endl;
+    timer.restart();
 
     // Binomial method: Binomial Leisen-Reimer
     method = "Extended Binomial Leisen-Reimer";
@@ -343,6 +351,7 @@ int main(int, char*[]) {
     seconds = timer.elapsed();
     std::cout << " \nRun completed in ";
     std::cout << seconds << " s\n" << std::endl;
+    timer.restart();
 
     // Binomial method: Binomial Joshi
     method = "Extended Binomial Joshi";
